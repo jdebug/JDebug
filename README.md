@@ -14,4 +14,4 @@ Edit the *SublimeJDB.sublime-settings*.  In particular,
 
 To debug:
 
-![screenshot](https://github.com/jdebug/JDebug/blob/master/jdebugging.gif)
+![screenshot](https://raw.githubusercontent.com/jdebug/JDebug/master/jdebugging.gif)
