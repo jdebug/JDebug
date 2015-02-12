@@ -1,0 +1,92 @@
+[
+
+    // {
+    //     "command": "jdb_edit_register",
+    //     "keys": ["enter"],
+    //     "context": [{"key": "jdb_running"}, {"key": "jdb_register_view"}]
+    // },
+    // {
+    //     "command": "jdb_edit_variable",
+    //     "keys": ["enter"],
+    //     "context": [{"key": "jdb_running"}, {"key": "jdb_variables_view"}]
+    // },
+    // {
+    //     "command": "jdb_expand_variable",
+    //     "keys": ["right"],
+    //     "context": [{"key": "jdb_running"}, {"key": "jdb_variables_view"}]
+    // },
+    // {
+    //     "command": "jdb_collapse_variable",
+    //     "keys": ["left"],
+    //     "context": [{"key": "jdb_running"}, {"key": "jdb_variables_view"}]
+    // },
+    {
+        "command": "jdb_toggle_breakpoint",
+        "keys": ["alt+b"]
+    },
+    {
+        "command": "jdb_launch",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": false}],
+        "keys": ["alt+f11"]
+    },
+    {
+        "command": "jdb_continue",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+f8"]
+    },
+    {
+        "command": "jdb_exit",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+f12"]
+    },
+    {
+        "command": "jdb_ignored",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": false}],
+        "keys": ["super+.", "super+x"]
+    },
+    {
+        "command": "jdb_step_over",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+f6"]
+    },
+    {
+        "command": "jdb_ignored",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": false}],
+        "keys": ["super+.", "super+o"]
+    },
+    {
+        "command": "jdb_step_into",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+f5"]
+    },
+    {
+        "command": "jdb_ignored",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": false}],
+        "keys": ["super+.", "super+i"]
+    },
+    {
+        "command": "jdb_step_out",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+f7"]
+    },
+    {
+        "command": "jdb_ignored",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": false}],
+        "keys": ["super+.", "super+u"]
+    },
+    {
+        "command": "jdb_print",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+f9"]
+    },
+    {
+        "command": "jdb_add_expression",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+f10"]
+    },
+    {
+        "command": "jdb_expand",
+        "context": [{"key": "jdb_running", "operator": "equal", "operand": true}],
+        "keys": ["alt+x"]
+    }
+]

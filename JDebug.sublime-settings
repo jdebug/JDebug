@@ -1,0 +1,35 @@
+{
+    "workingdir": "C:/workspace/Commsales",
+    "commandline": "jdb -connect com.sun.jdi.SocketAttach:hostname=localhost,port=8849",
+    "source_path_prefix": "/src/",
+    "push_pop_layout": true,
+    "close_views": true,
+    "debug": true,
+
+    "layout":
+    {
+        "cols": [0.0, 1.0],
+        "rows": [0.0, 0.75, 1.0],
+        "cells":
+        [ // c1 r1 c2 r2
+            [0, 0, 1, 1], // -> (0.00, 0.00), (1.00, 0.75)
+            [0, 1, 1, 2]  // -> (0.00, 0.75), (1.00, 1.00)
+        ]
+    },
+
+    "breakpoint_scope": "keyword.jdb",
+    "breakpoint_icon": "circle",
+    "position_scope": "entity.name.class",
+    "position_icon": "bookmark",
+    "changed_variable_scope": "entity.name.class",
+    "changed_variable_icon": "",
+
+    "file_group": 0,
+    "console_group": 1,
+    "console_open": true,
+    "variables_group": 1,
+    "variables_open": true,
+    "breakpoints_group": 1,
+    "breakpoints_open": true
+
+}

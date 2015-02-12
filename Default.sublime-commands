@@ -1,0 +1,52 @@
+[
+    {
+        "caption": "Preferences: JDebug Settings – Default",
+        "command": "open_file", "args":
+        {
+            "file": "${packages}/JDebug/JDebug.sublime-settings"
+        }
+    },
+    {
+        "caption": "Preferences: JDebug Settings – User",
+        "command": "open_file", "args":
+        {
+            "file": "${packages}/User/JDebug.sublime-settings"
+        }
+    },
+    {
+        "caption": "JDebug: Start Debugging",
+        "command": "jdb_launch"
+    },
+    {
+        "caption": "JDebug: Continue",
+        "command": "jdb_continue"
+    },
+    {
+        "caption": "JDebug: Step Over",
+        "command": "jdb_step_over"
+    },
+    {
+        "caption": "JDebug: Step Into",
+        "command": "jdb_step_into"
+    },
+    {
+        "caption": "JDebug: Step Out",
+        "command": "jdb_step_out"
+    },
+    {
+        "caption": "JDebug: Stop Debugging",
+        "command": "jdb_exit"
+    },
+    {
+        "caption": "JDebug: Open Console View",
+        "command": "jdb_open_console_view"
+    },
+    {
+        "caption": "JDebug: Open Variables View",
+        "command": "jdb_open_variables_view"
+    },
+    {
+        "caption": "JDebug: Open Breakpoint View",
+        "command": "jdb_open_breakpoint_view"
+    }
+]

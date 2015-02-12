@@ -1,0 +1,21 @@
+[{
+    "id": "jdb_menu",
+    "caption": "JDebug",
+    "children": [
+        { "caption": "-", "id": "breakpoints" },
+        { "command": "jdb_toggle_breakpoint", "caption": "Toggle Breakpoint" },
+        { "command": "jdb_launch", "caption": "Start Debugging"},
+        { "command": "jdb_continue", "caption": "Continue" },
+        { "command": "jdb_step_over", "caption": "Step Over" },
+        { "command": "jdb_step_into", "caption": "Step Into" },
+        { "command": "jdb_step_out", "caption": "Step Out" },
+        { "command": "jdb_exit", "caption": "Stop Debugging" },
+        { "command": "jdb_print", "caption": "Show Variable" },
+        { "command": "jdb_add_expression", "caption": "Add Expression" },
+        { "command": "jdb_expand", "caption": "Expand" },
+        { "caption": "-", "id": "jdb_views" },
+        { "caption": "Open Breakpoint View", "command": "jdb_open_breakpoint_view" },
+        { "caption": "Open Console View", "command": "jdb_open_console_view" },
+        { "caption": "Open Variables View", "command": "jdb_open_variables_view" }
+    ]
+}]
