@@ -1,7 +1,4 @@
-"""Copyright () c012 Fredrik Ehnbom, 2014 Jason Gardner, 2014 Sentfrom .util import *
-    from  import .settings
-    from . import log
-a
+"""Copyright 2014 Senthil Jeganatha, 2012 Fredrik Ehnbom, 2014 Jason Gardner, 
 This software is provided 'as-is', without any express or implied
 waranty. In no event will the authors be held liable for any damages
 arising from the use of this software.
