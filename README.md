@@ -9,6 +9,7 @@ JDebug is the Java Debugging Sublime Text plugin. It uses the Remote debugging f
 
 Edit the *SublimeJDB.sublime-settings*.  In particular,
 
+- **workingdir** - This should be set for Sublime Text 2. Set the project root like c:/workspace/TestService
 - **commandline** - Set to the command line string that will be used to launch JDB
 - **source_path_prefix** - Set to the folder where the java package resides,  usually /"src/" but for maven project it is "/src/main/java/"
 
