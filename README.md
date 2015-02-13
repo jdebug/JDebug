@@ -4,7 +4,7 @@
 JDebug is the Java Debugging Sublime Text plugin. It uses the Remote debugging features of JDB command.
 
 ## Usage ##
-**This is a beta version tested in Weblogic 11g(Windows and Ubuntu 14.04) with Sublime Text 3 and Java 1.6.0_29**
+**This is a beta version tested in Weblogic 11g(Windows and Ubuntu 14.04) with Sublime Text 2 & 3 and Java 1.6.0_29**
 
 
 Edit the *SublimeJDB.sublime-settings*.  In particular,
