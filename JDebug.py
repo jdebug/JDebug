@@ -32,11 +32,20 @@ import re
 import queue as Queue
 
 try:
+    import Queue
+except:
+    import queue as Queue
+
+try:
     from .util import *
     from .log import *
 except:
-    from util import *
-    from log import *
+    try:
+        from util import *
+        from log import *
+    except:
+        from JDebug.util import *
+        from JDebug.log import *
 
 
 jdb_lastresult = ""

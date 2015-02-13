@@ -1,5 +1,5 @@
 {
-    "workingdir": "C:/workspace/Commsales",
+    "workingdir": "C:/Workspace/TestService",
     "commandline": "jdb -connect com.sun.jdi.SocketAttach:hostname=localhost,port=8849",
     "source_path_prefix": "/src/",
     "push_pop_layout": true,

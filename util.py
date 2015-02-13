@@ -6,7 +6,10 @@ import sys
 try:
     from .settings import *
 except:
-    from settings import *
+    try:
+        from settings import *
+    except:
+        from JDebug.settings import *
 
 def determine_class_from_file(filename):
     """
@@ -22,7 +25,10 @@ def determine_file_from_class(class_name):
     """
     Figure out the absolute file name from a Java package/class
     """
-    project_root = sublime.active_window().project_data()['folders'][0]['path']
+    if int(sublime.version()) < 3000:
+        project_root = get_setting("workingdir", "/tmp")
+    else:
+        project_root = sublime.active_window().project_data()['folders'][0]['path']
     src_prefix = project_root + get_setting("source_path_prefix", "/src/main/java/")
     src_prefix = src_prefix.replace("\\", "/")
     filename = class_name.replace(".", "/")
@@ -30,7 +36,7 @@ def determine_file_from_class(class_name):
     return filename
 
 def icon_path(icon_name):
-    if int(sublime.version()) < 3014:
+    if int(sublime.version()) < 3000:
         path = '../JDebug'
         extn = ''
     else:
