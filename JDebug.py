@@ -247,12 +247,13 @@ class JDBVariable:
         self.is_expanded = False
         self.expression = None
         self.can_expand = False
+        self.is_array = False
 
     def has_children(self):
         return self.can_expand
 
     def __str__(self):
-        return "%s = %s" % (self.name, self.value)
+        return "%s => %s" % (self.name, self.value)
 
     def format(self, indent="", output="", line=0):
         picon = " "
@@ -973,23 +974,55 @@ class JdbPrint(sublime_plugin.TextCommand):
 def evaluate_expression(expression, parent=None):
     var_vals = run_cmd("dump %s" % expression)
 
-    # create expression as parent
-    if parent is None:
-         v = jdb_variables_view.add_variable(" " + expression + " = ")
-         v.expression = expression
+    # may be the variable is getting expanded is an array
+    is_expanding_array = False
+    if parent is not None:
+        is_expanding_array = parent.is_array
 
-    localLines = var_vals.split("\n")
+    if is_expanding_array:
+        localLines = var_vals.split("\n")[1].split(",")
+    else:
+        localLines = var_vals.split("\n")
+
+    # determine if the variable is array
+    if is_expanding_array == False:
+        if (localLines[0].endswith("{") and (localLines[1].find(",") != -1 or localLines[1].find(":") == -1)):
+            is_expanding_array = True
+            localLines = localLines[1].split(",")
+            v = jdb_variables_view.add_variable(" " + expression + " = ")
+            v.expression = expression
+
     children = []
+    array_indx = 0
     for ll in localLines:
+        if ll.endswith("{"):
+            # For complex objects create expression as parent
+            if parent is None:
+                v = jdb_variables_view.add_variable(" " + expression + " = ")
+                v.expression = expression
+
+
         if (ll.find("{") == -1 and ll.find("}") == -1):
-            isObject = ll.find("instance of ")
+            if ll.find("Internal exception") != -1:
+                break
+
+            is_object = ll.find("instance of ")
+            is_array = False
+            if is_object != -1:
+                #Find out if it is Array
+                if re.match(".*\[\d+\]\s\(id=\d+\)$$", ll) is not None:
+                    is_array = True
 
             newline = ll
             can_expand = False
-            if (isObject != -1):
-                newline = ll[0:isObject] + ll[isObject+12:]
+            if (is_object != -1):
+                newline = ll[0:is_object] + ll[is_object+12:]
                 can_expand = True
-            newline = newline.replace(":", " =")
+
+            if is_expanding_array:
+                newline = "    [%d] = %s" % (array_indx, newline)
+            else:
+                newline = newline.replace(":", " =")
 
             # if parent is passed then add the children
             if parent is not None:
@@ -998,8 +1031,14 @@ def evaluate_expression(expression, parent=None):
             else:
                 v = jdb_variables_view.add_variable(newline)
             if v:
-                v.expression = expression + "." + v.name.strip()
+                if is_expanding_array:
+                    v.expression = expression + "[" + str(array_indx) + "]"
+                else:
+                    v.expression = expression + "." + v.name.strip()
                 v.can_expand = can_expand
+                v.is_array = is_array
+
+            array_indx += 1
 
     if parent is not None:
         parent.children = children
