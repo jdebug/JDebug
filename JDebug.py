@@ -301,16 +301,6 @@ class JDBVariablesView(JDBView):
         line = 0
         line = self.find_regions(self.variables, expanded_regions, collapsed_regions, line)
 
-        # for var in self.variables:
-        #     line = line +1
-
-        #     log_debug("%s" % var.name)
-        #     if var.has_children():
-        #         if var.is_expanded:
-        #             expanded_regions.append(jdb_variables_view.view.full_line(jdb_variables_view.view.text_point(line-1, 0)))
-        #         else:
-        #             collapsed_regions.append(jdb_variables_view.view.full_line(jdb_variables_view.view.text_point(line-1, 0)))
-
         pos_scope = get_setting("position_scope", "entity.name.class")
         collapsed_icon = icon_path("collapsed")
         expanded_icon = icon_path("expanded")
@@ -445,8 +435,6 @@ class JDBBreakpointView(JDBView):
         if fn is None:
             return
         fn = normalize(fn)
-        log_debug("FileName %s" % fn)
-        log_debug("JDBCursor %s" % jdb_cursor)
 
         for bkpt in self.breakpoints:
             if bkpt.filename == fn and not (bkpt.line == jdb_cursor_position and fn == jdb_cursor):
@@ -519,7 +507,9 @@ def update_view_markers(view=None):
         jdb_last_cursor_view.erase_regions("jdebug.position")
     jdb_last_cursor_view = view
     view.add_regions("jdebug.position", cursor, pos_scope, pos_icon, sublime.HIDDEN)
-    view.sel().add(view.line(view.text_point(jdb_cursor_position - 1, 0)))
+
+    if jdb_cursor_position != 0:
+        view.sel().add(view.line(view.text_point(jdb_cursor_position - 1, 0)))
 
     jdb_breakpoint_view.update_marker(view)
 
@@ -754,7 +744,8 @@ class JdbLaunch(sublime_plugin.WindowCommand):
         global DEBUG
         global icon
         view = self.window.active_view()
-        DEBUG = get_setting("debug", False, view)
+        set_log_level(get_setting("debug", False, view))
+        
         icon = icon_path(icon_name="collapsed")
         log_debug("%s" % icon)
 

@@ -4,7 +4,7 @@
     "source_path_prefix": "/src/",
     "push_pop_layout": true,
     "close_views": true,
-    "debug": true,
+    "debug": false,
 
     "layout":
     {
