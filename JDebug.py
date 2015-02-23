@@ -46,6 +46,8 @@ except:
 
 jdb_lastresult = ""
 jdb_cursor = ""
+prev_lines = ""
+current_line = ""
 jdb_cursor_position = 0
 jdb_last_cursor_view = None
 jdb_bkp_layout = {}
@@ -55,6 +57,7 @@ jdb_shutting_down = False
 jdb_process = None
 jdb_run_status = None
 icon = None
+
 
 class JDBView(object):
     """
