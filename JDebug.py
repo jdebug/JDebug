@@ -624,7 +624,7 @@ def jdboutput(pipe):
     prev_lines = ""
     current_line = ""
     thread_out_regex = re.compile("^Thread-\d+\[\d+\]$")
-    ## bkpointhit_regex = re.match(r'Breakpoint.*\.\[\d+\]$', s)
+    
 
     while True:
         try:
@@ -661,7 +661,6 @@ def jdboutput(pipe):
             else:
                 if nextchar != "\r":
                     current_line = current_line + nextchar
-                    jdb_lastresult = "%s%s" % (countstr, prev_lines)
 
             if thread_out_regex.match(current_line) is not None:
                 unsol_result = "%s%s" % (prev_lines, current_line)
@@ -676,8 +675,8 @@ def jdboutput(pipe):
                 prev_lines = ""
 
 
-            if re.match("^(Breakpoint hit|Step completed)", prev_lines) is not None:
-                if re.match(".*\[\d+\]$", current_line) is not None:
+            if re.match(".*\[\d+\]$", current_line) is not None:
+                if re.match("^(Breakpoint hit|Step completed)", prev_lines) is not None:
                     log_debug("Breakpoint Hit ")
                     unsol_result = "%s%s" % (prev_lines, current_line)
                     log_debug("jdb_%s: %s" % ("stdout" if pipe == jdb_process.stdout else "stderr", unsol_result))
