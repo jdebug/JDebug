@@ -675,7 +675,7 @@ def jdboutput(pipe):
                 prev_lines = ""
 
 
-            if re.match(".*\[\d+\]$", current_line) is not None:
+            if re.match("^\[.*\].*\[\d+\]$", current_line) is not None:
                 if re.match("^(Breakpoint hit|Step completed)", prev_lines) is not None:
                     log_debug("Breakpoint Hit ")
                     unsol_result = "%s%s" % (prev_lines, current_line)
