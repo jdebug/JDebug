@@ -686,8 +686,10 @@ def jdboutput(pipe):
                         sublime.set_timeout(update_cursor, 0)
                     else:
                         jdb_lastresult = "%s%s" % (countstr, prev_lines)
-                    current_line = ""
-                    prev_lines = ""
+                else:
+                    jdb_lastresult = "%s%s" % (countstr, prev_lines)
+                current_line = ""
+                prev_lines = ""
 
         except:
             traceback.print_exc()
