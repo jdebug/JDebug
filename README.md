@@ -5,7 +5,7 @@ JDebug is the Java Debugging Sublime Text plugin. It uses the Remote debugging f
 
 ## More Details
 
-Get More Information from <http://blog.jdebugger.com/2015/02/jdebug-java-debugging-plugin-for.html>  
+Get More Information from the tutorial - <http://blog.jdebugger.com/2015/02/jdebug-java-debugging-plugin-for.html>  
 
 ## Usage ##
 **This is a beta version tested in Weblogic 11g(Windows and Ubuntu 14.04) with Sublime Text 2 & 3 and Java 1.6.0_29**
@@ -20,3 +20,7 @@ Edit the *SublimeJDB.sublime-settings*.  In particular,
 To debug:
 
 ![screenshot](https://raw.githubusercontent.com/jdebug/JDebug/master/jdebugging.gif)
+
+
+## Support ##
+**Please donate for supporting the devlopment or click the ad in the above tutorial page.**
