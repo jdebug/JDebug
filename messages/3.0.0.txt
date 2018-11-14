@@ -1,0 +1,5 @@
+3.0.0:
+ 
+   - Inline popup to inspect the variables are added. Click on any variable in debug mode to inspect the variable.
+
+💛 

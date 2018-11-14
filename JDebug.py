@@ -58,8 +58,8 @@ jdb_process = None
 jdb_run_status = None
 icon = None
 
-
 class JDBView(object):
+
     """
     Base class for each view (tab) in the debugger
     """
@@ -95,7 +95,7 @@ class JDBView(object):
             self.destroy_view()
 
     def should_update(self):
-        return self.is_open() and is_running() and jdb_run_status == "stopped"
+        return self.is_open() and is_running() and jdb_run_status == "running"
 
     def set_syntax(self, syntax):
         if self.is_open():
@@ -275,6 +275,25 @@ class JDBVariable:
                 output, line = child.format(indent, output, line)
         return (output, line)
 
+    def formatHtml(self, hindent="", html_output=""):
+        picon = ""
+        if self.has_children():
+            if self.is_expanded:
+                picon = "<a href=''><b>-</b></a>"
+            else:
+                picon = "<b><a href='%s'>+</a></b>" % self.expression
+
+        html_output += "%s%s%s<br>" % (hindent, picon, self.replace_leading_spaces("%s" % self))
+        hindent += "&nbsp;&nbsp;&nbsp;&nbsp;"
+        if self.is_expanded:
+            for child in self.children:
+                html_output = child.formatHtml(hindent, html_output)
+        return html_output
+
+    def replace_leading_spaces(self, text, char="&nbsp;"):
+        stripped = text.lstrip()
+        return char * (len(text) - len(stripped)) + stripped
+    
 
 class JDBVariablesView(JDBView):
     """
@@ -287,20 +306,28 @@ class JDBVariablesView(JDBView):
     def open(self):
         super(JDBVariablesView, self).open()
         self.set_syntax("Packages/Java/Java.tmLanguage")
-        if self.is_open() and jdb_run_status == "stopped":
+        if self.is_open() and jdb_run_status == "running":
             self.update_variables(False)
 
-    def update_view(self):
+    def update_view(self, popup=False):
         self.clear()
 
         output = ""
         line = 0
         expanded_regions = []
         collapsed_regions = []
-        for local in self.variables:
-            output, line = local.format(line=line)
+        content = ['<style>a {color: #99cc99;font-size: 15px;text-decoration: none}</style>']
+        for variable in self.variables:            
+            output, line = variable.format(line=line)
             self.add_line(output)
+
+            if inline_expression is not None and variable.expression == inline_expression:
+                content.append(variable.formatHtml())
+
         self.update()
+
+        if popup:
+            sublime.active_window().active_view().show_popup('<br>'.join(content), location=-1, max_width=600, on_navigate=self.expand)
 
         line = 0
         line = self.find_regions(self.variables, expanded_regions, collapsed_regions, line)
@@ -353,7 +380,10 @@ class JDBVariablesView(JDBView):
                     parts = ll.split(" = ")
                     var_vals = run_cmd("print %s" % parts[0])
                     if len(var_vals) != 0:
-                        self.add_variable(var_vals)
+                        v = self.add_variable(var_vals)
+                        if v:
+                            v.expression = parts[0].strip()
+
             self.update_view()
 
     def get_variable_at_line(self, line, var_list=None):
@@ -369,6 +399,34 @@ class JDBVariablesView(JDBView):
                 return self.get_variable_at_line(line, var_list[i - 1].children)
         return self.get_variable_at_line(line, var_list[len(var_list) - 1].children)
 
+    def get_variable_by_expression(self, expression, var_list=None):
+        if var_list is None:
+            var_list = self.variables
+        if len(var_list) == 0:
+            return None
+
+        var = None
+        for i in range(len(var_list)):
+            if var_list[i].expression == expression:
+                return var_list[i]
+            elif var_list[i].has_children:
+                var = self.get_variable_by_expression(expression, var_list[i].children)
+                if var is not None:
+                    return var
+
+    def remove_variable_by_expression(self, expression, var_list=None):
+        if var_list is None:
+            var_list = self.variables
+        if len(var_list) == 0:
+            return None
+
+        for i in range(len(var_list)-1, -1, -1):
+            if var_list[i].expression == expression:
+                self.variables.pop(i);
+        
+    def expand(self, expression):
+        variable_to_expand = self.get_variable_by_expression(expression)
+        evaluate_expression(expression, variable_to_expand, True)
 
 class JDBBreakpoint(object):
     """
@@ -501,7 +559,7 @@ def update_view_markers(view=None):
     if fn is not None:
         fn = normalize(fn)
     pos_scope = get_setting("position_scope", "entity.name.class")
-    pos_icon = get_setting("position_icon", "bookmark")
+    pos_icon = get_setting("position_icon", "pointer")
 
     cursor = []
     if fn == jdb_cursor and jdb_cursor_position != 0:
@@ -582,7 +640,7 @@ def update_cursor():
     global jdb_cursor
     global jdb_cursor_position
 
-    if jdb_run_status != "running":
+    if jdb_run_status != "stopped":
         res = run_cmd("where")
 
         first_line = res.split("\n")[0]
@@ -666,23 +724,24 @@ def jdboutput(pipe):
                 unsol_result = "%s%s" % (prev_lines, current_line)
                 log_debug("jdb_%s: %s" % ("stdout" if pipe == jdb_process.stdout else "stderr", unsol_result))
                 jdb_console_view.add_line("<-%s\n" % unsol_result, False)
-                if jdb_run_status == "running":
-                    jdb_run_status = "stopped"
+                if jdb_run_status == "stopped":
+                    jdb_run_status = "running"
                     sublime.set_timeout(update_cursor, 0)
                 else:
                     jdb_lastresult = "%s%s" % (countstr, prev_lines)
                 current_line = ""
                 prev_lines = ""
 
-
-            if re.match("^\[.*\].*\[\d+\]$", current_line) is not None:
+    
+            if re.match("^\[.*\].*\[\d+\]$", current_line) is not None or re.match("^\S.*\[\d+\]$", current_line) is not None:
+            # if re.match("^.*\[\d+\]$", current_line) is not None:
                 if re.match("^(Breakpoint hit|Step completed)", prev_lines) is not None:
-                    log_debug("Breakpoint Hit ")
+                    log_debug("Breakpoint Hit---> ")
                     unsol_result = "%s%s" % (prev_lines, current_line)
                     log_debug("jdb_%s: %s" % ("stdout" if pipe == jdb_process.stdout else "stderr", unsol_result))
                     jdb_console_view.add_line("<-%s\n" % unsol_result, False)
-                    if jdb_run_status == "running":
-                        jdb_run_status = "stopped"
+                    if jdb_run_status == "stopped":
+                        jdb_run_status = "running"
                         sublime.set_timeout(update_cursor, 0)
                     else:
                         jdb_lastresult = "%s%s" % (countstr, prev_lines)
@@ -732,7 +791,7 @@ def go_to_run_state():
     """
     global jdb_run_status
     jdb_variables_view.clear_view()
-    jdb_run_status = "running"
+    jdb_run_status = "stopped"
 
 
 class JdbLaunch(sublime_plugin.WindowCommand):
@@ -752,7 +811,6 @@ class JdbLaunch(sublime_plugin.WindowCommand):
         set_log_level(get_setting("debug", False, view))
         
         icon = icon_path(icon_name="collapsed")
-        log_debug("%s" % icon)
 
         if jdb_process is None or jdb_process.poll() is not None:
             commandline = get_setting("commandline", view=view)
@@ -837,7 +895,7 @@ class JdbContinue(sublime_plugin.WindowCommand):
         run_cmd("cont", False)
 
     def is_enabled(self):
-        return is_running() and jdb_run_status != "running"
+        return is_running() and jdb_run_status != "stopped"
 
     def is_visible(self):
         return is_running()
@@ -869,7 +927,7 @@ class JdbStepOver(sublime_plugin.WindowCommand):
         run_cmd("next", False)
 
     def is_enabled(self):
-        return is_running() and jdb_run_status != "running"
+        return is_running() and jdb_run_status != "stopped"
 
     def is_visible(self):
         return is_running()
@@ -884,7 +942,7 @@ class JdbStepInto(sublime_plugin.WindowCommand):
         run_cmd("step", False)
 
     def is_enabled(self):
-        return is_running() and jdb_run_status != "running"
+        return is_running() and jdb_run_status != "stopped"
 
     def is_visible(self):
         return is_running()
@@ -899,7 +957,7 @@ class JdbStepOut(sublime_plugin.WindowCommand):
         run_cmd("step up", False)
 
     def is_enabled(self):
-        return is_running() and jdb_run_status != "running"
+        return is_running() and jdb_run_status != "stopped"
 
     def is_visible(self):
         return is_running()
@@ -975,7 +1033,7 @@ class JdbPrint(sublime_plugin.TextCommand):
         evaluate_expression(text)
 
 
-def evaluate_expression(expression, parent=None):
+def evaluate_expression(expression, parent=None, popup=False):
     var_vals = run_cmd("dump %s" % expression)
 
     # may be the variable is getting expanded is an array
@@ -1004,7 +1062,10 @@ def evaluate_expression(expression, parent=None):
             if parent is None:
                 v = jdb_variables_view.add_variable(" " + expression + " = ")
                 v.expression = expression
-
+                if popup:
+                    v.is_expanded = True
+                    v.can_expand = True
+                    parent = v
 
         if (ll.find("{") == -1 and ll.find("}") == -1):
             if ll.find("Internal exception") != -1:
@@ -1034,6 +1095,7 @@ def evaluate_expression(expression, parent=None):
                 children.append(v)
             else:
                 v = jdb_variables_view.add_variable(newline)
+
             if v:
                 if is_expanding_array:
                     v.expression = expression + "[" + str(array_indx) + "]"
@@ -1047,10 +1109,13 @@ def evaluate_expression(expression, parent=None):
     if parent is not None:
         parent.children = children
         parent.is_expanded = True
-    jdb_variables_view.update_view()
+
+    jdb_variables_view.update_view(popup)
 
 
 class JdbEventListener(sublime_plugin.EventListener):
+    global showPopup
+
     """
     Respond to system-level view events
     """
@@ -1081,6 +1146,46 @@ class JdbEventListener(sublime_plugin.EventListener):
                 v.was_closed()
                 break
 
+    def on_selection_modified(self, view):
+
+        fn = view.file_name()
+        if fn is None:
+            return;
+        name, ext = os.path.splitext(fn)
+        if ext != '.java':
+            return;
+
+        if is_running() and jdb_run_status == "running":
+            sublime.set_timeout(lambda:self.run(view, 'selection_modified'), 0)
+        else:
+            showPopup = False
+            view.hide_popup()
+
+    def run(self, view, where):
+        global region_row, inline_expression
+
+        view_settings = view.settings()
+        if view_settings.get('is_widget'):
+            return
+
+        for region in view.sel():
+            region_row, region_col = view.rowcol(region.begin())
+
+            if region_row != view_settings.get('jdb_row', -1):
+                view_settings.set('jdb_row', region_row)
+            else:
+                return
+
+            showPopup = True
+            inline_expression = self.getText(view)
+
+            jdb_variables_view.remove_variable_by_expression(inline_expression)
+            if inline_expression is not None and len(inline_expression.strip()) > 0:
+                evaluate_expression(inline_expression, None, True);
+
+    def getText(self, view):
+        global region_row
+        return view.substr(view.word(view.sel()[0]))
 
 class JdbOpenConsoleView(sublime_plugin.WindowCommand):
     """
