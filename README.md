@@ -16,16 +16,16 @@ Get More Information from the tutorial - <http://blog.jdebugger.com/2015/02/jdeb
 ## Setting App server (Weblogic/Tomcat/any other) in Debug mode
 Pass `-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000` as JVM argument to server startup command. You can change the debug port from 8000 to anything you prefer.
 
-#Tomcat#
+### Tomcat ###
 Add/update the JAVA_OPTS env variable in catalina.bat or catalina.sh
 `set JAVA_OPTS=%JAVA_OPTS% -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000`
 
-#Weblogic#
+### Weblogic ###
 Add/update the SAVE_JAVA_OPTIONS env variable in catalina.bat or catalina.sh
 `set SAVE_JAVA_OPTIONS=%JAVA_OPTIONS% -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000
 `
 
-##To debug##
+## To Debug ##
 
 ![screenshot](https://raw.githubusercontent.com/jdebug/JDebug/master/jdebugging.gif)
 
